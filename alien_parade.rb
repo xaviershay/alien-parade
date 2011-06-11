@@ -6,10 +6,25 @@ class GameWindow < Gosu::Window
     self.caption = "Alien Parade"
 
     @followers = []
-    x = 130
+    x = 150
+    last_char = ''
+    kerning = {
+      'AL' => -8,
+      'LI' => -5,
+      'IE' => -5,
+      'EN' => -5,
+      ' P' => -5,
+      'PA' => -3,
+      'AR' => -2,
+      'RA' => -5,
+      'AD' => -2,
+      'DE' => -8
+    }
     @letters = self.caption.upcase.chars.map.with_index do |char, index|
+      x += (kerning[last_char + char] || 0)
       letter = Letter.new(self, char, x, index + 6)
       x += letter.width
+      last_char = char
       letter
     end
     @letters.last.add_arrived_at_center_observer do
@@ -78,7 +93,7 @@ class GameWindow < Gosu::Window
 end
 
 class Letter
-  LETTER_FULL_WIDTH = 48
+  LETTER_FULL_WIDTH = 46
 
   attr_accessor :y_offset
 

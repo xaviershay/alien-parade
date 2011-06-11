@@ -24,14 +24,6 @@ class GameWindow < Gosu::Window
     end
   end
 
-  def reset
-    @followers = 50.times.map {
-      alien = Alien.new(self)
-      alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
-      alien
-    }
-  end
-
   def update
     @ticks += 1
     @letters.each(&:update)

@@ -70,7 +70,9 @@ class GameWindow < Gosu::Window
     if id == Gosu::Button::KbEscape
       close
     else
-      self.stage = 2
+      if @stage == 1
+        self.stage = 2
+      end
     end
   end
 

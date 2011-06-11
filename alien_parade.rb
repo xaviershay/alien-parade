@@ -1,12 +1,17 @@
 require 'gosu'
 
 class GameWindow < Gosu::Window
-
   def initialize
     super(800, 600, false)
     self.caption = "Alien Parade"
 
     @followers = []
+    x = 300
+    @letters = self.caption.upcase.chars.map.with_index do |char, index|
+      letter = Letter.new(self, char, x, index + 6)
+      x += letter.width
+      letter
+    end
   end
 
   def reset
@@ -22,10 +27,13 @@ class GameWindow < Gosu::Window
     @followers.each {|x| x.follow(@followers); x.wander }
     @followers.each(&:move)
     @followers.delete_if(&:off_screen?)
+    @letters.each(&:update)
+    @letters.delete_if(&:off_screen?)
   end
 
   def draw
     @followers.each(&:draw)
+    @letters.each(&:draw)
   end
 
   def maybe_add_new_alien
@@ -34,6 +42,48 @@ class GameWindow < Gosu::Window
       alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
       @followers << alien
     end
+  end
+end
+
+class Letter
+  LETTER_FULL_WIDTH = 14
+
+  attr_accessor :y_offset
+
+  def initialize(window, letter, x, delay)
+    @window = window
+    @delay = delay * 5
+    @y_accel  = -0.5
+    @y_vel    = 0
+    @y_offset = 200
+    @x_offset = x
+
+    # TODO: Default value hash
+    @letter_widths = {
+      'I' => 9
+    }
+    @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 30, 5, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
+  end
+
+  def update
+    if @delay > 0
+      @delay -= 1
+    else
+      @y_vel += @y_accel
+      @y_offset += @y_vel
+    end
+  end
+
+  def draw
+    @image.draw(@x_offset, @y_offset, 0)
+  end
+
+  def width
+    @image.width
+  end
+
+  def off_screen?
+    @y_offset < -@image.height
   end
 end
 

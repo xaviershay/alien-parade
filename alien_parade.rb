@@ -60,7 +60,7 @@ class Letter
     @delay = delay * 5
     @y_accel  = -0.5
     @y_vel    = 0
-    @y_offset = 200
+    @y_offset = 250
     @x_offset = x
 
     # TODO: Default value hash

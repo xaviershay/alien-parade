@@ -6,7 +6,7 @@ class GameWindow < Gosu::Window
     super(800, 600, false)
     self.caption = "Alien Parade"
 
-    reset
+    @followers = []
   end
 
   def reset
@@ -18,18 +18,23 @@ class GameWindow < Gosu::Window
   end
 
   def update
+    maybe_add_new_alien
     @followers.each {|x| x.follow(@followers); x.wander }
     @followers.each(&:move)
-
-    if (@followers).all?(&:off_screen?)
-      reset
-    end
+    @followers.delete_if(&:off_screen?)
   end
 
   def draw
     @followers.each(&:draw)
   end
 
+  def maybe_add_new_alien
+    if rand < 0.3
+      alien = Alien.new(self)
+      alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
+      @followers << alien
+    end
+  end
 end
 
 class Alien

@@ -19,6 +19,9 @@ class GameWindow < Gosu::Window
     @stage = 0
     @delay = 50
     @ticks = 0
+    @alien_images = Dir["alien-*.png"].map do |image|
+      Gosu::Image.new(self, image, false)
+    end
   end
 
   def reset
@@ -57,7 +60,7 @@ class GameWindow < Gosu::Window
 
   def maybe_add_new_alien
     if rand < 0.3
-      alien = Alien.new(self)
+      alien = Alien.new(self, @alien_images.sample)
       alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
       @followers << alien
     end
@@ -141,8 +144,8 @@ end
 class Alien
   attr_reader :angle, :speed
 
-  def initialize(window)
-    @image = Gosu::Image.new(window, Dir["alien-*.png"].sample, false)
+  def initialize(window, image)
+    @image = image 
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @angle = 0
     @vel_x = 2

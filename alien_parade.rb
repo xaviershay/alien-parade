@@ -13,7 +13,7 @@ class GameWindow < Gosu::Window
     @leader = Alien.new(self)
     @leader.warp(400, 600)
 
-    @followers = 5.times.map {
+    @followers = 15.times.map {
       alien = Alien.new(self)
       alien.warp(400 + (rand - 0.5) * 200, 700 + (rand - 0.5) * 100)
       alien

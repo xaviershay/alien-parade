@@ -10,36 +10,30 @@ class GameWindow < Gosu::Window
   end
 
   def reset
-    @leader = Alien.new(self)
-    @leader.warp(400, 600)
-
-    @followers = 15.times.map {
+    @followers = 50.times.map {
       alien = Alien.new(self)
-      alien.warp(400 + (rand - 0.5) * 200, 700 + (rand - 0.5) * 100)
+      alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
       alien
     }
   end
 
   def update
-    @leader.wander
-    @leader.move
-    @followers.each {|x| x.follow([@leader] + @followers); x.wander }
+    @followers.each {|x| x.follow(@followers); x.wander }
     @followers.each(&:move)
 
-    if ([@leader] + @followers).all?(&:off_screen?)
+    if (@followers).all?(&:off_screen?)
       reset
     end
   end
 
   def draw
-    @leader.draw
     @followers.each(&:draw)
   end
 
 end
 
 class Alien
-  attr_reader :angle
+  attr_reader :angle, :speed
 
   def initialize(window)
     @image = Gosu::Image.new(window, "starfighter-small.png", false)
@@ -48,7 +42,7 @@ class Alien
     @vel_x = 2
     @aim = 90
     @ideal  = 90 
-    @speed  = 6
+    @speed  = 8
   end
 
   def off_screen?
@@ -73,6 +67,16 @@ class Alien
         @angle -= 1.0
       end
     end
+
+    speed  = others.map(&:speed).inject(0) {|a, b| a + b} / others.size.to_f
+
+    if rand < 0.8
+      if @speed < speed
+        @speed += 0.05
+      else
+        @speed -= 0.05
+      end
+    end
   end
 
   def wander
@@ -93,7 +97,7 @@ class Alien
     elsif rand >= 0.5
       @speed += 0.2
     end
-    @speed = [2, @speed].max
+    @speed = [3, @speed].max
 
     if @angle < @aim
       @angle += 1

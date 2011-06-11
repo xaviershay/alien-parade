@@ -6,7 +6,7 @@ class GameWindow < Gosu::Window
     self.caption = "Alien Parade"
 
     @followers = []
-    x = 300
+    x = 120
     @letters = self.caption.upcase.chars.map.with_index do |char, index|
       letter = Letter.new(self, char, x, index + 6)
       x += letter.width
@@ -46,7 +46,7 @@ class GameWindow < Gosu::Window
 end
 
 class Letter
-  LETTER_FULL_WIDTH = 14
+  LETTER_FULL_WIDTH = 48
 
   attr_accessor :y_offset
 
@@ -60,9 +60,9 @@ class Letter
 
     # TODO: Default value hash
     @letter_widths = {
-      'I' => 9
+      'I' => 20,
     }
-    @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 30, 5, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
+    @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 64, 25, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
   end
 
   def update

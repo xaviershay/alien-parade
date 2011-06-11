@@ -40,8 +40,8 @@ class Alien
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @angle = 0
     @vel_x = 2
-    @aim = 90
-    @ideal  = 90 
+    @aim = 0
+    @ideal  = 0 
     @speed  = 8
   end
 
@@ -85,9 +85,9 @@ class Alien
       chance_of_turning_towards = diff / 180.0
       direction = @angle < @ideal ? 1 : -1
       if rand <= chance_of_turning_towards
-        @aim = @angle + 12 * direction
-      else
         @aim = @angle - 12 * direction
+      else
+        @aim = @angle + 12 * direction
       end
     end
 

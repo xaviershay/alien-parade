@@ -12,6 +12,7 @@ class GameWindow < Gosu::Window
       x += letter.width
       letter
     end
+    @delay = 60
   end
 
   def reset
@@ -23,12 +24,16 @@ class GameWindow < Gosu::Window
   end
 
   def update
-    maybe_add_new_alien
-    @followers.each {|x| x.follow(@followers); x.wander }
-    @followers.each(&:move)
-    @followers.delete_if(&:off_screen?)
-    @letters.each(&:update)
-    @letters.delete_if(&:off_screen?)
+    if @delay <= 0
+      maybe_add_new_alien
+      @followers.each {|x| x.follow(@followers); x.wander }
+      @followers.each(&:move)
+      @followers.delete_if(&:off_screen?)
+      @letters.each(&:update)
+      @letters.delete_if(&:off_screen?)
+    else
+      @delay -= 1
+    end
   end
 
   def draw

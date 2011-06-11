@@ -47,7 +47,7 @@ class Alien
     @vel_x = 2
     @aim = 0
     @ideal  = 0 
-    @speed  = 8
+    @speed  = 6 + rand(3) - 1
   end
 
   def off_screen?

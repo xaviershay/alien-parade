@@ -36,7 +36,7 @@ class Alien
   attr_reader :angle, :speed
 
   def initialize(window)
-    @image = Gosu::Image.new(window, "starfighter-small.png", false)
+    @image = Gosu::Image.new(window, Dir["alien-*.png"].sample, false)
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @angle = 0
     @vel_x = 2

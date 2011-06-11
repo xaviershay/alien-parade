@@ -6,13 +6,19 @@ class GameWindow < Gosu::Window
     self.caption = "Alien Parade"
 
     @followers = []
-    x = 120
+    x = 130
     @letters = self.caption.upcase.chars.map.with_index do |char, index|
       letter = Letter.new(self, char, x, index + 6)
       x += letter.width
       letter
     end
-    @delay = 150
+    @letters.last.add_arrived_at_center_observer do
+      self.stage = 1
+    end
+    @tap_to_start = Gosu::Image.from_text(self, "TAP TO START", './amerika-sans.ttf', 24, 25, width, :center)
+    @stage = 0
+    @delay = 50
+    @ticks = 0
   end
 
   def reset
@@ -24,21 +30,29 @@ class GameWindow < Gosu::Window
   end
 
   def update
+    @ticks += 1
     @letters.each(&:update)
     @letters.delete_if(&:off_top?)
-    if @delay <= 0
-      maybe_add_new_alien
-      @followers.each {|x| x.follow(@followers); x.wander }
-      @followers.each(&:move)
-      @followers.delete_if(&:off_top?)
-    else
-      @delay -= 1
+    if @stage == 2
+      if @delay > 0
+        @delay -= 1
+      else
+        maybe_add_new_alien
+        @followers.each {|x| x.follow(@followers); x.wander }
+        @followers.each(&:move)
+        @followers.delete_if(&:off_top?)
+      end
     end
   end
 
   def draw
     @followers.each(&:draw)
     @letters.each(&:draw)
+    if @stage == 1
+      if (@ticks / 30) % 2 == 0
+        @tap_to_start.draw(0, 350, 0)
+      end
+    end
   end
 
   def maybe_add_new_alien
@@ -46,6 +60,22 @@ class GameWindow < Gosu::Window
       alien = Alien.new(self)
       alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
       @followers << alien
+    end
+  end
+
+  def button_down(id)
+    if id == Gosu::Button::KbEscape
+      close
+    else
+      self.stage = 2
+    end
+  end
+
+  def stage=(value)
+    @stage = value
+    @ticks = 0
+    @letters.each do |x|
+      x.stage = @stage
     end
   end
 end
@@ -58,23 +88,40 @@ class Letter
   def initialize(window, letter, x, delay)
     @window = window
     @delay = delay * 5
+    @original_delay = @delay
     @y_offset = 600 
     @x_offset = x
 
-    # TODO: Default value hash
     @letter_widths = {
       'I' => 20,
     }
     @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 64, 25, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
     @ticks = 0
+    @stage = 0
+    @arrived_at_center_observers = []
+    @notified_observers = false
+  end
+
+  def stage=(value)
+    @stage = value
+    @delay = @original_delay
+  end
+
+  def add_arrived_at_center_observer(&block)
+    @arrived_at_center_observers << block
   end
 
   def update
     if @delay > 0
       @delay -= 1
     else
-      @ticks += 1
-      @y_offset = -50 * (@ticks / 50.0 - 2) ** 7 + 250
+      if (@y_offset > 250 && @stage == 0) || @stage == 2
+        @ticks += 1
+        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 7 + 250
+      elsif !@notified_observers
+        @arrived_at_center_observers.each(&:call)
+        @notified_observers = true
+      end
     end
   end
 

@@ -12,7 +12,7 @@ class GameWindow < Gosu::Window
       x += letter.width
       letter
     end
-    @delay = 60
+    @delay = 150
   end
 
   def reset
@@ -24,13 +24,13 @@ class GameWindow < Gosu::Window
   end
 
   def update
+    @letters.each(&:update)
+    @letters.delete_if(&:off_top?)
     if @delay <= 0
       maybe_add_new_alien
       @followers.each {|x| x.follow(@followers); x.wander }
       @followers.each(&:move)
-      @followers.delete_if(&:off_screen?)
-      @letters.each(&:update)
-      @letters.delete_if(&:off_screen?)
+      @followers.delete_if(&:off_top?)
     else
       @delay -= 1
     end
@@ -58,9 +58,7 @@ class Letter
   def initialize(window, letter, x, delay)
     @window = window
     @delay = delay * 5
-    @y_accel  = -0.5
-    @y_vel    = 0
-    @y_offset = 250
+    @y_offset = 600 
     @x_offset = x
 
     # TODO: Default value hash
@@ -68,14 +66,15 @@ class Letter
       'I' => 20,
     }
     @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 64, 25, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
+    @ticks = 0
   end
 
   def update
     if @delay > 0
       @delay -= 1
     else
-      @y_vel += @y_accel
-      @y_offset += @y_vel
+      @ticks += 1
+      @y_offset = -50 * (@ticks / 50.0 - 2) ** 7 + 250
     end
   end
 
@@ -87,7 +86,7 @@ class Letter
     @image.width
   end
 
-  def off_screen?
+  def off_top?
     @y_offset < -@image.height
   end
 end
@@ -105,7 +104,7 @@ class Alien
     @speed  = 6 + rand(3) - 1
   end
 
-  def off_screen?
+  def off_top?
     @y < -40
   end
 

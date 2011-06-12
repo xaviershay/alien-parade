@@ -38,9 +38,9 @@ class GameWindow < Gosu::Window
     @delay = 50
     @ticks = 0
     @alien_images = Dir["alien-*.png"].map do |image|
-      Gosu::Image.new(self, image, false)
+      Gosu::Image.new(self, image, true)
     end
-    @banana_images = Dir["pbj.gif"].map do |image|
+    @banana_images = Dir["pbj-*.png"].map do |image|
       Gosu::Image.new(self, image, true)
     end
   end
@@ -59,6 +59,7 @@ class GameWindow < Gosu::Window
         @followers.delete_if(&:off_top?)
       end
     end
+    @followers.each(&:update)
   end
 
   def draw
@@ -80,7 +81,7 @@ class GameWindow < Gosu::Window
       end
     else
       if rand < 0.1
-        banana = Alien.new(self, @banana_images.sample)
+        banana = Banana.new(self, @banana_images)
         banana.warp(WIDTH / 2 + (rand - 0.5) * WIDTH / 4, HEIGHT + 300 + (rand - 0.5) * 600)
         banana.speed -= 5
         banana.min_speed = 1
@@ -196,8 +197,15 @@ class Alien
     @x, @y = x, y
   end
 
+  def image 
+    @image
+  end
+
+  def update
+  end
+
   def draw
-    @image.draw_rot(@x, @y, 1, 180 + @angle)
+    image.draw_rot(@x, @y, 1, 180 + @angle)
   end
 
   def follow(others)
@@ -252,6 +260,29 @@ class Alien
   def move
     @x += Gosu::offset_x(@angle, @speed)
     @y += Gosu::offset_y(@angle, @speed)
+  end
+end
+
+# This is an abuse of inheritance, sorry god.
+class Banana < Alien
+  def initialize(window, images)
+    super
+    @image = nil
+    @images = images
+    @image_index = 0
+    @ticks = 0
+  end
+
+  def update
+    super
+    @ticks = (@ticks + 1) % 6 
+    if @ticks == 0
+      @image_index = (@image_index + 1) % @images.size
+    end
+  end
+
+  def image
+    @images[@image_index]
   end
 end
 

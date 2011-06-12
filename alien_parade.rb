@@ -40,13 +40,16 @@ class GameWindow < Gosu::Window
     @alien_images = Dir["alien-*.png"].map do |image|
       Gosu::Image.new(self, image, false)
     end
+    @banana_images = Dir["bananajour.png"].map do |image|
+      Gosu::Image.new(self, image, false)
+    end
   end
 
   def update
     @ticks += 1
     @letters.each(&:update)
     @letters.delete_if(&:off_top?)
-    if @stage == 2
+    if @stage >= 2
       if @delay > 0
         @delay -= 1
       else
@@ -69,16 +72,32 @@ class GameWindow < Gosu::Window
   end
 
   def maybe_add_new_alien
-    if rand < 0.3
-      alien = Alien.new(self, @alien_images.sample)
-      alien.warp(WIDTH / 2 + (rand - 0.5) * WIDTH / 4, HEIGHT + 300 + (rand - 0.5) * 600)
-      @followers << alien
+    if @stage == 2
+      if rand < 0.3
+        alien = Alien.new(self, @alien_images.sample)
+        alien.warp(WIDTH / 2 + (rand - 0.5) * WIDTH / 4, HEIGHT + 300 + (rand - 0.5) * 600)
+        @followers << alien
+      end
+    else
+      if rand < 0.1
+        banana = Alien.new(self, @banana_images.sample)
+        banana.warp(WIDTH / 2 + (rand - 0.5) * WIDTH / 4, HEIGHT + 300 + (rand - 0.5) * 600)
+        banana.speed -= 5
+        banana.min_speed = 1
+        @followers << banana
+      end
     end
   end
 
   def button_down(id)
     if id == Gosu::Button::KbEscape
       close
+    elsif id == Gosu::Button::KbB
+      if @stage == 2
+        @stage = 3
+      elsif @stage == 3
+        @stage = 2
+      end
     else
       if @stage == 1
         self.stage = 2
@@ -132,7 +151,7 @@ class Letter
     if @delay > 0
       @delay -= 1
     else
-      if (@y_offset > CENTERISH && @stage == 0) || @stage == 2
+      if (@y_offset > CENTERISH && @stage == 0) || @stage >= 2
         @ticks += 1
         @y_offset = -50 * (@ticks / 50.0 - XSHIFT) ** 5 + CENTERISH
       elsif !@notified_observers
@@ -156,7 +175,7 @@ class Letter
 end
 
 class Alien
-  attr_reader :angle, :speed
+  attr_accessor :angle, :speed, :min_speed
 
   def initialize(window, image)
     @image = image 
@@ -166,6 +185,7 @@ class Alien
     @aim = 0
     @ideal  = 0 
     @speed  = 6 + rand(3) - 1
+    @min_speed = 3
   end
 
   def off_top?
@@ -220,7 +240,7 @@ class Alien
     elsif rand >= 0.5
       @speed += 0.2
     end
-    @speed = [3, @speed].max
+    @speed = [@min_speed, @speed].max
 
     if @angle < @aim
       @angle += 1

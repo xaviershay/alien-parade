@@ -1,30 +1,51 @@
 require 'gosu'
 
-WIDTH  = 800
-HEIGHT = 600
+if ENV['SPRITE_PARADE']
+  TITLE  = "Sprite Parade" 
+  WIDTH  = 1200
+  HEIGHT = 800
+  FONT   = './proclamate_light.ttf'
+  FONT_SIZE = 92
+  KERNING = Hash.new(-50) 
+  KERNING.update(
+    'Sp' => -28,
+    'Pa' => -28,
+    'ri' => -54,
+    'it' => -54
+  )
+  TTS = "Tap To Start"
+else
+  TITLE = "ALIEN PARADE"
+  TTS = "TAP TO START"
+  WIDTH  = 800
+  HEIGHT = 600
+  FONT_SIZE = 64
+  FONT   = './amerika-sans.ttf'
+  KERNING = Hash.new(-16) 
+  KERNING.update(Hash[{
+    'AL' => -8,
+    'LI' => -5,
+    'IE' => -3,
+    'EN' => -5,
+    ' P' => -5,
+    'PA' => -3,
+    'AR' => -2,
+    'RA' => -5,
+    'AD' => -2,
+    'DE' => -8
+  }.map {|(k, v)| [k, v - 16] }])
+end
 
 class GameWindow < Gosu::Window
   def initialize
     super(WIDTH, HEIGHT, true)
-    caption = self.caption = "Alien Parade"
+    caption = self.caption = TITLE
 
     @followers = []
     last_char = ''
-    kerning = {
-      'AL' => -8,
-      'LI' => -5,
-      'IE' => -5,
-      'EN' => -5,
-      ' P' => -5,
-      'PA' => -3,
-      'AR' => -2,
-      'RA' => -5,
-      'AD' => -2,
-      'DE' => -8
-    }
     x = WIDTH / 2 - 250
-    @letters = caption.upcase.chars.map.with_index do |char, index|
-      x += (kerning[last_char + char] || 0)
+    @letters = caption.chars.map.with_index do |char, index|
+      x += (KERNING[last_char + char] || 0)
       letter = Letter.new(self, char, x, index + 6)
       x += letter.width
       last_char = char
@@ -33,12 +54,18 @@ class GameWindow < Gosu::Window
     @letters.last.add_arrived_at_center_observer do
       self.stage = 1
     end
-    @tap_to_start = Gosu::Image.from_text(self, "TAP TO START", './amerika-sans.ttf', 24, 25, width, :center)
+    @tap_to_start = Gosu::Image.from_text(self, TTS, FONT, 24, 25, width, :center)
     @stage = 0
     @delay = 50
     @ticks = 0
-    @alien_images = Dir["alien-*.png"].map do |image|
-      Gosu::Image.new(self, image, true)
+    if ENV['SPRITE_PARADE']
+      @alien_images = 
+        Gosu::Image.load_tiles(self, 'sprites.png', 40, 40, false) +
+        Gosu::Image.load_tiles(self, 'sprites-2.png', 80, 80, false)
+    else
+      @alien_images = Dir["alien-*.png"].map do |image|
+        Gosu::Image.new(self, image, true)
+      end
     end
     @banana_images = Dir["pbj-*.png"].map do |image|
       Gosu::Image.new(self, image, true)
@@ -116,7 +143,7 @@ class GameWindow < Gosu::Window
 end
 
 class Letter
-  LETTER_FULL_WIDTH = 46
+  LETTER_FULL_WIDTH = (FONT_SIZE * 3/3.0).round
   CENTERISH = HEIGHT / 2 - 100
   XSHIFT = ((HEIGHT - CENTERISH) / 5.0) ** (1/5.0)
 
@@ -132,7 +159,7 @@ class Letter
     @letter_widths = {
       'I' => 20,
     }
-    @image = Gosu::Image.from_text(window, letter, './amerika-sans.ttf', 64, 25, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
+    @image = Gosu::Image.from_text(window, letter, FONT, FONT_SIZE, 25, @letter_widths[letter] || LETTER_FULL_WIDTH, :center)
     @ticks = 0
     @stage = 0
     @arrived_at_center_observers = []

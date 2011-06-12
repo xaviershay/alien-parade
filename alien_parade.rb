@@ -232,7 +232,7 @@ class Alien
   end
 
   def draw
-    image.draw_rot(@x, @y, 1, 180 + @angle)
+    image.draw_rot(@x, @y, 1, @angle)
   end
 
   def follow(others)

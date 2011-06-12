@@ -40,8 +40,8 @@ class GameWindow < Gosu::Window
     @alien_images = Dir["alien-*.png"].map do |image|
       Gosu::Image.new(self, image, false)
     end
-    @banana_images = Dir["bananajour.png"].map do |image|
-      Gosu::Image.new(self, image, false)
+    @banana_images = Dir["pbj.gif"].map do |image|
+      Gosu::Image.new(self, image, true)
     end
   end
 

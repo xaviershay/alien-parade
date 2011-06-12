@@ -133,7 +133,7 @@ class Letter
     else
       if (@y_offset > centerish && @stage == 0) || @stage == 2
         @ticks += 1
-        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 7 + centerish
+        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 5 + centerish
       elsif !@notified_observers
         @arrived_at_center_observers.each(&:call)
         @notified_observers = true

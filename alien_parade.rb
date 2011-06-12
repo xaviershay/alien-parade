@@ -1,12 +1,14 @@
 require 'gosu'
 
+WIDTH  = 800
+HEIGHT = 600
+
 class GameWindow < Gosu::Window
   def initialize
-    super(800, 600, false)
-    self.caption = "Alien Parade"
+    super(WIDTH, HEIGHT, true)
+    caption = self.caption = "Alien Parade"
 
     @followers = []
-    x = 150
     last_char = ''
     kerning = {
       'AL' => -8,
@@ -20,7 +22,8 @@ class GameWindow < Gosu::Window
       'AD' => -2,
       'DE' => -8
     }
-    @letters = self.caption.upcase.chars.map.with_index do |char, index|
+    x = WIDTH / 2 - 250
+    @letters = caption.upcase.chars.map.with_index do |char, index|
       x += (kerning[last_char + char] || 0)
       letter = Letter.new(self, char, x, index + 6)
       x += letter.width
@@ -60,7 +63,7 @@ class GameWindow < Gosu::Window
     @letters.each(&:draw)
     if @stage == 1
       if (@ticks / 30) % 2 == 0
-        @tap_to_start.draw(0, 350, 0)
+        @tap_to_start.draw(0, HEIGHT / 2, 0)
       end
     end
   end
@@ -68,7 +71,7 @@ class GameWindow < Gosu::Window
   def maybe_add_new_alien
     if rand < 0.3
       alien = Alien.new(self, @alien_images.sample)
-      alien.warp(400 + (rand - 0.5) * 200, 900 + (rand - 0.5) * 600)
+      alien.warp(WIDTH / 2 + (rand - 0.5) * WIDTH / 4, HEIGHT + 300 + (rand - 0.5) * 600)
       @followers << alien
     end
   end
@@ -101,7 +104,7 @@ class Letter
     @window = window
     @delay = delay * 5
     @original_delay = @delay
-    @y_offset = 600 
+    @y_offset = HEIGHT + 100 
     @x_offset = x
 
     @letter_widths = {
@@ -124,12 +127,13 @@ class Letter
   end
 
   def update
+    centerish = HEIGHT / 2 - 100
     if @delay > 0
       @delay -= 1
     else
-      if (@y_offset > 250 && @stage == 0) || @stage == 2
+      if (@y_offset > centerish && @stage == 0) || @stage == 2
         @ticks += 1
-        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 7 + 250
+        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 7 + centerish
       elsif !@notified_observers
         @arrived_at_center_observers.each(&:call)
         @notified_observers = true

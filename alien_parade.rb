@@ -97,6 +97,8 @@ end
 
 class Letter
   LETTER_FULL_WIDTH = 46
+  CENTERISH = HEIGHT / 2 - 100
+  XSHIFT = ((HEIGHT - CENTERISH) / 5.0) ** (1/5.0)
 
   attr_accessor :y_offset
 
@@ -127,13 +129,12 @@ class Letter
   end
 
   def update
-    centerish = HEIGHT / 2 - 100
     if @delay > 0
       @delay -= 1
     else
-      if (@y_offset > centerish && @stage == 0) || @stage == 2
+      if (@y_offset > CENTERISH && @stage == 0) || @stage == 2
         @ticks += 1
-        @y_offset = -50 * (@ticks / 50.0 - 1.8) ** 5 + centerish
+        @y_offset = -50 * (@ticks / 50.0 - XSHIFT) ** 5 + CENTERISH
       elsif !@notified_observers
         @arrived_at_center_observers.each(&:call)
         @notified_observers = true

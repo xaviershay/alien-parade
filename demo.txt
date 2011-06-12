@@ -1,0 +1,2 @@
+ruby alien_parade.rb
+SPRITE_PARADE=1 ruby alien_parade.rb

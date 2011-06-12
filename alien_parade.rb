@@ -2,8 +2,8 @@ require 'gosu'
 
 if ENV['SPRITE_PARADE']
   TITLE  = "Sprite Parade" 
-  WIDTH  = 1200
-  HEIGHT = 800
+  WIDTH  = 1024
+  HEIGHT = 768
   FONT   = './proclamate_light.ttf'
   FONT_SIZE = 92
   KERNING = Hash.new(-50) 

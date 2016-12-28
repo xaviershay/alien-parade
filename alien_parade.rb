@@ -1,12 +1,12 @@
 require 'gosu'
 
 if ENV['SPRITE_PARADE']
-  TITLE  = "Sprite Parade" 
+  TITLE  = "Sprite Parade"
   WIDTH  = 1024
   HEIGHT = 768
   FONT   = './proclamate_light.ttf'
   FONT_SIZE = 92
-  KERNING = Hash.new(-50) 
+  KERNING = Hash.new(-50)
   KERNING.update(
     'Sp' => -28,
     'Pa' => -28,
@@ -21,7 +21,7 @@ else
   HEIGHT = 600
   FONT_SIZE = 64
   FONT   = './amerika-sans.ttf'
-  KERNING = Hash.new(-16) 
+  KERNING = Hash.new(-16)
   KERNING.update(Hash[{
     'AL' => -8,
     'LI' => -5,
@@ -59,7 +59,7 @@ class GameWindow < Gosu::Window
     @delay = 50
     @ticks = 0
     if ENV['SPRITE_PARADE']
-      @alien_images = 
+      @alien_images =
         Gosu::Image.load_tiles(self, 'sprites.png', 40, 40, false) +
         Gosu::Image.load_tiles(self, 'sprites-2.png', 80, 80, false)
     else
@@ -153,7 +153,7 @@ class Letter
     @window = window
     @delay = delay * 5
     @original_delay = @delay
-    @y_offset = HEIGHT + 100 
+    @y_offset = HEIGHT + 100
     @x_offset = x
 
     @letter_widths = {
@@ -206,12 +206,12 @@ class Alien
   attr_accessor :angle, :speed, :min_speed
 
   def initialize(window, image)
-    @image = image 
+    @image = image
     @x = @y = @vel_x = @vel_y = @angle = 0.0
     @angle = 0
     @vel_x = 2
     @aim = 0
-    @ideal  = 0 
+    @ideal  = 0
     @speed  = 6 + rand(3) - 1
     @min_speed = 3
   end
@@ -224,7 +224,7 @@ class Alien
     @x, @y = x, y
   end
 
-  def image 
+  def image
     @image
   end
 
@@ -240,7 +240,7 @@ class Alien
 
     if rand < 0.8
       if @angle < aim
-        @angle += 1.0 
+        @angle += 1.0
       else
         @angle -= 1.0
       end
@@ -302,7 +302,7 @@ class Banana < Alien
 
   def update
     super
-    @ticks = (@ticks + 1) % 6 
+    @ticks = (@ticks + 1) % 6
     if @ticks == 0
       @image_index = (@image_index + 1) % @images.size
     end

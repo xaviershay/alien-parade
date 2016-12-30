@@ -269,7 +269,6 @@ class Alien
       end
     end
 
-    x = rand
     if rand < 0.4
       @speed -= 0.2
     elsif rand >= 0.5
